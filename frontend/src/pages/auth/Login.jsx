@@ -179,16 +179,6 @@ export default function Login() {
                             </button>
                         </form>
 
-                        {/* Demo Credentials */}
-                        <div className="mt-8 pt-6 border-t border-gray-100">
-                            <p className="text-xs text-center text-gray-400 mb-3">Demo Access</p>
-                            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 text-center border border-blue-100/50">
-                                <p className="text-sm text-gray-600">
-                                    <span className="font-medium text-gray-700">admin@campusorbit.com</span>
-                                </p>
-                                <p className="text-xs text-gray-400 mt-1">Platform Admin Account</p>
-                            </div>
-                        </div>
                     </div>
 
                     {/* Footer */}
