@@ -99,10 +99,10 @@ export default function Login() {
                 <div className="w-full max-w-md">
                     {/* Mobile Logo */}
                     <div className="lg:hidden text-center mb-8">
-                        <h1 className="text-3xl font-bold text-gray-900">
-                            Campus<span className="text-blue-600">orbit</span>
+                        <h1 className="text-3xl font-bold">
+                            <span className="text-blue-700">Campus</span><span className="text-blue-500">orbit</span>
                         </h1>
-                        <p className="text-gray-500 mt-1">Smart School Management Platform</p>
+                        <p className="text-gray-600 mt-1">Smart School Management Platform</p>
                     </div>
 
                     {/* Login Card */}
@@ -182,8 +182,8 @@ export default function Login() {
                     </div>
 
                     {/* Footer */}
-                    <p className="text-center text-gray-400 text-xs mt-8">
-                        © 2024 Campusorbit. All rights reserved.
+                    <p className="text-center text-gray-500 text-xs mt-8">
+                        © 2025 Campusorbit. All rights reserved.
                     </p>
                 </div>
             </div>
