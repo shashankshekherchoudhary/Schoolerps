@@ -27,7 +27,7 @@ export default function SchoolDashboard() {
             color: 'blue',
             bgColor: 'bg-blue-50',
             iconColor: 'text-blue-600',
-            trend: '+12 this month'
+            trend: 'Enrolled students'
         },
         {
             label: 'Total Teachers',
