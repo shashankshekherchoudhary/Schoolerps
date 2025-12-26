@@ -34,15 +34,27 @@ def create_superuser():
             user.is_active = True
             user.role = 'platform_admin'
             user.save()
-            print(f"SUCCESS: Created new superuser '{email}'")
+            print(f"SUCCESS: Created new superuser '{email}' with default password.")
+            print(f"⚠️  IMPORTANT: Change this password immediately after first login!")
         else:
-            # EMERGENCY FIX: Force Password Reset for this deploy
-            user.set_password(password)
-            user.is_staff = True
-            user.is_superuser = True
-            user.is_active = True
-            user.save()
-            print(f"SUCCESS: EMERGENT: Reset password for '{email}' to default.")
+            # PRODUCTION SAFE: Do NOT reset password for existing users
+            # Only ensure permissions are correct
+            needs_update = False
+            if not user.is_staff:
+                user.is_staff = True
+                needs_update = True
+            if not user.is_superuser:
+                user.is_superuser = True
+                needs_update = True
+            if not user.is_active:
+                user.is_active = True
+                needs_update = True
+            
+            if needs_update:
+                user.save()
+                print(f"INFO: Updated permissions for '{email}' (password unchanged).")
+            else:
+                print(f"INFO: Superuser '{email}' already exists with correct permissions.")
             
     except Exception as e:
         print(f"ERROR: Failed to configure superuser. Reason: {e}")
