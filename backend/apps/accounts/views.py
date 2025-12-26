@@ -103,3 +103,39 @@ class PasswordChangeView(APIView):
         user.save()
         
         return Response({'message': 'Password changed successfully.'})
+
+
+class DebugStatusView(APIView):
+    """
+    Safe diagnostic endpoint to verify Production setup.
+    Public access allowed.
+    """
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        from django.conf import settings
+        
+        email = "admin@campusorbit.com"
+        try:
+            user = User.objects.get(email=email)
+            user_status = {
+                "exists": True,
+                "is_active": user.is_active,
+                "is_superuser": user.is_superuser
+            }
+        except User.DoesNotExist:
+            user_status = {
+                "exists": False,
+                "error": "Admin user not found int DB"
+            }
+            
+        data = {
+            "status": "online",
+            "db_engine": settings.DATABASES['default']['ENGINE'],
+            "admin_user": user_status,
+            "security": {
+                "allowed_hosts": settings.ALLOWED_HOSTS,
+                "debug_mode": settings.DEBUG,
+            }
+        }
+        return Response(data)
