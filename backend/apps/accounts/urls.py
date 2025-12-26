@@ -8,8 +8,7 @@ from .views import (
     CustomTokenObtainPairView,
     LogoutView,
     CurrentUserView,
-    PasswordChangeView,
-    DebugStatusView
+    PasswordChangeView
 )
 
 urlpatterns = [
@@ -18,5 +17,4 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('me/', CurrentUserView.as_view(), name='current_user'),
     path('change-password/', PasswordChangeView.as_view(), name='change_password'),
-    path('debug-status/', DebugStatusView.as_view(), name='debug_status'),
 ]
