@@ -76,11 +76,15 @@ TEMPLATES = [
 WSGI_APPLICATION = 'campusorbit.wsgi.application'
 
 # Database - Using SQLite for development (switch to PostgreSQL for production)
+# Database - Using SQLite for development, PostgreSQL for production
+import dj_database_url
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': config(
+        'DATABASE_URL',
+        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
+        cast=dj_database_url.parse
+    )
 }
 
 # Password validation
