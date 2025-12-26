@@ -79,6 +79,22 @@
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
   }
 
+  /* Form input and select - explicit visible borders */
+  .form-input,
+  .form-select {
+    @apply w-full px-4 py-3 text-sm text-gray-900 border border-gray-300 rounded-xl bg-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-all duration-200;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+
+  .form-input:focus,
+  .form-select:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  }
+
+  .form-label {
+    @apply block text-sm font-medium text-gray-700 mb-1.5;
+  }
+
   .label {
     @apply block text-sm font-medium text-gray-700 mb-1.5;
   }
