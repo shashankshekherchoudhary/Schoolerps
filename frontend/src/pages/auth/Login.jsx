@@ -60,7 +60,7 @@ export default function Login() {
                         <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-2xl mb-4">
                             <GraduationCap className="w-8 h-8 text-primary-600" />
                         </div>
-                        <h1 className="text-2xl font-bold text-gray-900">
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                             Campus<span className="text-primary-600">orbit</span>
                         </h1>
                         <p className="text-gray-500 mt-1">School ERP System</p>
