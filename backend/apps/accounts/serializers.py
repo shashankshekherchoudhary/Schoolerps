@@ -55,10 +55,20 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return data
 
     def _get_feature_toggles(self, user):
-        toggles = {'notes': False}  # Default
+        toggles = {
+            'notes': False,
+            'attendance': True,
+            'fees': True,
+            'exams': True,
+            'student_login': True
+        }
         if user.school and hasattr(user.school, 'feature_toggle'):
             ft = user.school.feature_toggle
             toggles['notes'] = ft.notes_enabled
+            toggles['attendance'] = ft.attendance_enabled
+            toggles['fees'] = ft.fees_enabled
+            toggles['exams'] = ft.exams_enabled
+            toggles['student_login'] = ft.student_login_enabled
         return toggles
 
 
@@ -82,10 +92,20 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'date_joined', 'last_login']
     
     def get_feature_toggles(self, obj):
-        toggles = {'notes': False}
+        toggles = {
+            'notes': False,
+            'attendance': True,
+            'fees': True,
+            'exams': True,
+            'student_login': True
+        }
         if obj.school and hasattr(obj.school, 'feature_toggle'):
             ft = obj.school.feature_toggle
             toggles['notes'] = ft.notes_enabled
+            toggles['attendance'] = ft.attendance_enabled
+            toggles['fees'] = ft.fees_enabled
+            toggles['exams'] = ft.exams_enabled
+            toggles['student_login'] = ft.student_login_enabled
         return toggles
 
 
