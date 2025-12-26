@@ -18,7 +18,7 @@ Before you open Railway, ensure these are true (We have verified these):
 ## 2️⃣ Step-by-Step Deployment
 
 ### Phase 1: Create Project & Database
-1.  Log in to [Railway.app](https://railway.app/).
+1.  Log in to [Railway.app](https://railway.app/).  
 2.  Click **+ New Project** → **Provision PostgreSQL**.
 3.  This creates a new project with a database.
 4.  Click on the **PostgreSQL** card.
@@ -47,8 +47,9 @@ Before you open Railway, ensure these are true (We have verified these):
 3.  Click the NEW card (setup 2).
 4.  Go to **Settings** → **General**.
 5.  **Root Directory**: Change `/` to `/frontend`.
-6.  Go to **Variables** tab. Add this:
+6.  Go to **Variables** tab. Add this **IMMEDIATELY** (Before the build finishes if possible, or trigger a redeploy after):
     *   `VITE_API_URL`: (Paste the **Backend URL** from Phase 2, e.g., `https://web-production-123...`)
+    *   *Note: This is required at BUILD TIME because of our Dockerfile setup.*
 7.  Go to **Settings** → **Networking**.
 8.  Click **Generate Domain**. (e.g., `schoolerp-frontend.up.railway.app`). **COPY THIS URL.**
 
@@ -57,8 +58,15 @@ Before you open Railway, ensure these are true (We have verified these):
 2.  Go to **Variables**.
 3.  Add/Update:
     *   `CORS_ALLOWED_ORIGINS`: (Paste your **Frontend URL** from Phase 3).
+        *   **Example:** `https://schoolerp-frontend.up.railway.app`
+        *   **Important:** NO trailing slash `/` at the end!
     *   `CSRF_TRUSTED_ORIGINS`: (Paste your **Backend URL**).
+        *   **Example:** `https://web-production-123.up.railway.app`
 4.  Railway will automatically restart the Backend.
+    *   *Startup Magic:* Our updated Dockerfile will automatically:
+        *   Run Database Migrations.
+        *   Create/Verify the Superuser (`admin@campusorbit.com`).
+        *   Start the server with Gunicorn.
 
 ---
 
