@@ -26,4 +26,4 @@ COPY . /app/
 # RUN python manage.py collectstatic --noinput
 
 # Run the application
-CMD ["gunicorn", "campusorbit.wsgi:application", "--bind", "0.0.0.0:$PORT"]
+CMD gunicorn campusorbit.wsgi:application --bind 0.0.0.0:$PORT
