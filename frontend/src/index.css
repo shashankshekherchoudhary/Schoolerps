@@ -1,0 +1,729 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom base styles */
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900;
+    @apply dark:bg-slate-900 dark:text-gray-100;
+    transition: background-color 200ms ease-out, color 200ms ease-out;
+    line-height: 1.6;
+  }
+}
+
+/* Custom component classes */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 font-medium text-sm rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+
+  .btn-primary {
+    @apply bg-primary-600 text-white hover:bg-primary-500 focus:ring-primary-500;
+    box-shadow: 0 1px 3px 0 rgba(37, 99, 235, 0.3), 0 1px 2px -1px rgba(37, 99, 235, 0.2);
+  }
+
+  .btn-primary:hover {
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3), 0 2px 4px -2px rgba(37, 99, 235, 0.2);
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary {
+    @apply bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-300 focus:ring-gray-400;
+  }
+
+  .dark .btn-secondary {
+    @apply bg-slate-800 text-gray-200 border-slate-700 hover:bg-slate-700 hover:border-slate-600;
+  }
+
+  .btn-success {
+    @apply bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-500;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+  }
+
+  .btn-lg {
+    @apply px-6 py-3 text-base;
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+
+  .input {
+    @apply w-full px-4 py-3 text-sm border border-gray-200 rounded-xl bg-white placeholder-gray-400 focus:outline-none focus:border-primary-400 transition-all duration-200;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  }
+
+  .input:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  }
+
+  .select {
+    @apply w-full px-4 py-3 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:border-primary-400 transition-all duration-200 cursor-pointer;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  }
+
+  .select:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  }
+
+  .label {
+    @apply block text-sm font-medium text-gray-700 mb-1.5;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl border border-gray-100 overflow-hidden;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+    transition: transform 150ms ease-out, box-shadow 150ms ease-out;
+  }
+
+  .dark .card {
+    @apply bg-slate-800 border-slate-700;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 2px -1px rgba(0, 0, 0, 0.15);
+  }
+
+  .card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 2px 6px -2px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Cards that should not animate (forms, tables inside) */
+  .card-static,
+  .card:has(form),
+  .card:has(.table) {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .card-static:hover,
+  .card:has(form):hover,
+  .card:has(.table):hover {
+    transform: none !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .card-header {
+    @apply px-6 py-4 border-b border-gray-100;
+  }
+
+  .dark .card-header {
+    @apply border-gray-700;
+  }
+
+  .card-body {
+    @apply p-6;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-success {
+    @apply bg-emerald-100 text-emerald-800;
+  }
+
+  .dark .badge-success {
+    @apply bg-emerald-900/50 text-emerald-300 border border-emerald-700;
+  }
+
+  .badge-danger {
+    @apply bg-red-100 text-red-800;
+  }
+
+  .dark .badge-danger {
+    @apply bg-red-900/50 text-red-300 border border-red-700;
+  }
+
+  .badge-warning {
+    @apply bg-amber-100 text-amber-800;
+  }
+
+  .dark .badge-warning {
+    @apply bg-amber-900/50 text-amber-300 border border-amber-700;
+  }
+
+  .badge-info {
+    @apply bg-blue-100 text-blue-800;
+  }
+
+  .dark .badge-info {
+    @apply bg-blue-900/50 text-blue-300 border border-blue-700;
+  }
+
+  .table-container {
+    @apply overflow-x-auto;
+  }
+
+  .table {
+    @apply w-full text-sm;
+  }
+
+  .table th {
+    @apply px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider bg-gray-50 border-b border-gray-100;
+    @apply dark:bg-slate-800 dark:text-gray-300 dark:border-slate-700;
+  }
+
+  .table td {
+    @apply px-6 py-4 text-gray-700 border-b border-gray-50;
+    @apply dark:text-gray-300 dark:border-slate-800;
+    transition: background-color 150ms ease-out;
+  }
+
+  .table tbody tr {
+    @apply bg-white dark:bg-slate-900;
+    transition: all 150ms ease-out;
+  }
+
+  .table tbody tr:hover {
+    @apply bg-primary-50/50 dark:bg-slate-800;
+  }
+
+  .table tbody tr:hover td {
+    @apply text-gray-900 dark:text-white;
+  }
+
+  /* Zebra striping for better readability */
+  .table tbody tr:nth-child(even) {
+    @apply bg-gray-50/30 dark:bg-slate-800/30;
+  }
+
+  .table tbody tr:nth-child(even):hover {
+    @apply bg-primary-50 dark:bg-gray-800;
+  }
+
+  /* Premium stat cards with gradient accent */
+  .stat-card {
+    @apply bg-white rounded-xl border border-gray-200/80 p-6;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(249, 250, 251, 1) 100%);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+    transition: transform 200ms ease-out, box-shadow 200ms ease-out, border-color 200ms ease-out;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+    opacity: 0;
+    transition: opacity 200ms ease-out;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.1), 0 4px 10px -4px rgba(0, 0, 0, 0.06);
+    border-color: rgba(59, 130, 246, 0.15);
+  }
+
+  .stat-card:hover::before {
+    opacity: 1;
+  }
+
+  /* Dark mode stat cards */
+  .dark .stat-card {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 1) 0%, rgba(15, 23, 42, 1) 100%);
+    border-color: rgba(51, 65, 85, 0.5);
+  }
+
+  .dark .stat-card:hover {
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.3), 0 4px 10px -4px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Dashboard summary cards with glassmorphism */
+  .summary-card {
+    @apply bg-white/80 rounded-xl border border-gray-200/60 p-6;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: transform 180ms ease-out, box-shadow 180ms ease-out, border-color 180ms ease-out;
+  }
+
+  .summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.1);
+    border-color: rgba(59, 130, 246, 0.3);
+  }
+
+  .dark .summary-card {
+    @apply bg-gray-800/80 border-gray-700/50;
+  }
+
+  /* List item cards with accent on hover */
+  .list-card {
+    @apply bg-white rounded-lg border border-gray-200 p-4;
+    transition: all 150ms ease-out;
+    border-left: 3px solid transparent;
+  }
+
+  .list-card:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08);
+    border-left-color: #3b82f6;
+    background-color: #fafbfc;
+  }
+
+  .dark .list-card {
+    @apply bg-gray-800 border-gray-700;
+  }
+
+  .dark .list-card:hover {
+    background-color: rgba(55, 65, 81, 0.5);
+    border-left-color: #60a5fa;
+  }
+
+  /* Premium button styles */
+  .btn-primary {
+    @apply bg-gradient-to-r from-primary-600 to-primary-500 text-white hover:from-primary-700 hover:to-primary-600 focus:ring-primary-500 shadow-md hover:shadow-lg;
+    transition: all 200ms ease-out;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  /* Form inputs with focus glow */
+  /* Form inputs with focus glow */
+  .input:focus,
+  .select:focus,
+  .form-input:focus,
+  .form-select:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  }
+
+  .dark .input,
+  .dark .select,
+  .dark .form-input,
+  .dark .form-select {
+    @apply bg-gray-900/50 border-gray-700 text-white placeholder-gray-500;
+  }
+
+  .dark .input:focus,
+  .dark .select:focus,
+  .dark .form-input:focus,
+  .dark .form-select:focus {
+    @apply border-primary-500 bg-gray-900;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+  }
+
+  .dark .label {
+    @apply text-gray-400;
+  }
+
+  /* Mobile tap feedback */
+  @media (hover: none) {
+
+    .card:active,
+    .stat-card:active,
+    .summary-card:active,
+    .list-card:active {
+      transform: scale(0.98);
+      transition: transform 100ms ease-out;
+    }
+  }
+
+  /* Empty state styling */
+  .empty-state {
+    @apply flex flex-col items-center justify-center py-16 px-4 text-center;
+  }
+
+  .empty-state-icon {
+    @apply w-20 h-20 mx-auto mb-6 text-gray-400;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .dark .empty-state-icon {
+    @apply text-gray-600;
+  }
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  /* Progress bar gradient */
+  .progress-gradient {
+    background: linear-gradient(90deg, #10b981, #34d399);
+  }
+
+  .progress-gradient-blue {
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  }
+
+  /* Card with colored top border */
+  .card-accent-blue {
+    border-top: 3px solid #3b82f6;
+  }
+
+  .card-accent-green {
+    border-top: 3px solid #10b981;
+  }
+
+  .card-accent-amber {
+    border-top: 3px solid #f59e0b;
+  }
+
+  .card-accent-red {
+    border-top: 3px solid #ef4444;
+  }
+}
+
+/* Spinner animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  @apply w-5 h-5 border-2 border-gray-200 border-t-primary-600 rounded-full;
+  animation: spin 0.8s linear infinite;
+}
+
+.spinner-lg {
+  @apply w-8 h-8;
+  border-width: 3px;
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 200ms ease-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 300ms ease-out;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 200ms ease-out;
+}
+
+/* Mobile safe area */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Page transitions */
+.page-enter {
+  animation: slideUp 300ms ease-out;
+}
+
+/* Loading skeleton */
+.skeleton {
+  @apply bg-gray-200 animate-pulse rounded;
+}
+
+/* ============================================
+   GLOBAL DESIGN CONSISTENCY IMPROVEMENTS
+   ============================================ */
+
+/* Enhanced placeholder contrast */
+::placeholder {
+  @apply text-gray-500;
+  opacity: 1;
+}
+
+input::placeholder,
+textarea::placeholder {
+  @apply text-gray-500;
+}
+
+/* Disabled inputs - readable but clearly disabled */
+input:disabled,
+select:disabled,
+textarea:disabled,
+.input:disabled,
+.select:disabled {
+  @apply bg-gray-100 text-gray-600 cursor-not-allowed border-gray-200;
+  opacity: 0.8;
+}
+
+.dark input:disabled,
+.dark select:disabled,
+.dark textarea:disabled {
+  @apply bg-gray-700 text-gray-400 border-gray-600;
+}
+
+/* Modal improvements - fully light with strong contrast */
+.modal-overlay {
+  @apply fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  @apply bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden;
+  max-height: 90vh;
+}
+
+.modal-header {
+  @apply px-6 py-4 border-b border-gray-100;
+}
+
+.modal-header h2,
+.modal-header h3 {
+  @apply text-lg font-semibold text-gray-900;
+}
+
+.modal-body {
+  @apply p-6 overflow-y-auto;
+  max-height: calc(90vh - 140px);
+}
+
+.modal-footer {
+  @apply px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3;
+}
+
+/* Page headings with strong contrast */
+h1,
+.page-title {
+  @apply text-2xl font-bold text-gray-900;
+}
+
+h2,
+.section-title {
+  @apply text-xl font-semibold text-gray-900;
+}
+
+h3,
+.card-title {
+  @apply text-lg font-semibold text-gray-900;
+}
+
+.dark h1,
+.dark h2,
+.dark h3,
+.dark .page-title,
+.dark .section-title,
+.dark .card-title {
+  @apply text-white;
+}
+
+/* Page header and subtitle */
+.page-header {
+  @apply mb-6;
+}
+
+.page-subtitle {
+  @apply text-sm text-gray-600 mt-1;
+}
+
+.dark .page-subtitle {
+  @apply text-gray-400;
+}
+
+/* Helper/description text - visible but secondary */
+.helper-text,
+.description,
+.text-muted {
+  @apply text-sm text-gray-600;
+}
+
+.dark .helper-text,
+.dark .description,
+.dark .text-muted {
+  @apply text-gray-400;
+}
+
+/* Form field improvements */
+.form-group {
+  @apply mb-4;
+}
+
+.form-group label {
+  @apply block text-sm font-medium text-gray-700 mb-1.5;
+}
+
+.dark .form-group label {
+  @apply text-gray-300;
+}
+
+/* Error states with strong visibility */
+.input-error,
+input.error,
+select.error,
+textarea.error {
+  @apply border-red-500 focus:border-red-500 focus:ring-red-500;
+}
+
+.error-message {
+  @apply text-sm text-red-600 mt-1;
+}
+
+/* Success states */
+.input-success {
+  @apply border-emerald-500 focus:border-emerald-500 focus:ring-emerald-500;
+}
+
+/* Date picker and dropdown consistency */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
+  @apply bg-white text-gray-900 border-gray-300;
+}
+
+.dark input[type="date"],
+.dark input[type="time"],
+.dark input[type="datetime-local"] {
+  @apply bg-gray-800 text-white border-gray-600;
+}
+
+/* Textarea styling */
+textarea {
+  @apply resize-y min-h-[100px];
+}
+
+/* Table cell text - ensure readability */
+.table td {
+  @apply text-gray-800;
+}
+
+.dark .table td {
+  @apply text-gray-200;
+}
+
+/* Empty state text improvements */
+.empty-state p,
+.empty-state-text {
+  @apply text-gray-600;
+}
+
+.dark .empty-state p,
+.dark .empty-state-text {
+  @apply text-gray-400;
+}
+
+/* Status indicators with good contrast */
+.status-active {
+  @apply text-emerald-700 bg-emerald-100;
+}
+
+.status-inactive {
+  @apply text-gray-700 bg-gray-100;
+}
+
+.status-pending {
+  @apply text-amber-700 bg-amber-100;
+}
+
+.status-error {
+  @apply text-red-700 bg-red-100;
+}
+
+/* Info callouts */
+.callout-info {
+  @apply bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4;
+}
+
+.callout-warning {
+  @apply bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-4;
+}
+
+.callout-error {
+  @apply bg-red-50 border border-red-200 text-red-800 rounded-lg p-4;
+}
+
+.callout-success {
+  @apply bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg p-4;
+}
+
+/* Link styling for readability */
+a:not(.btn):not([class*="nav"]) {
+  @apply text-primary-600 hover:text-primary-700 underline-offset-2;
+}
+
+.dark a:not(.btn):not([class*="nav"]) {
+  @apply text-primary-400 hover:text-primary-300;
+}
+
+/* Focus visible for accessibility */
+:focus-visible {
+  @apply outline-2 outline-offset-2 outline-primary-500;
+}
+
+/* Mobile readability improvements */
+@media (max-width: 640px) {
+  body {
+    @apply text-base;
+    line-height: 1.6;
+  }
+
+  .table td,
+  .table th {
+    @apply px-3 py-3 text-sm;
+  }
+
+  h1,
+  .page-title {
+    @apply text-xl;
+  }
+
+  h2,
+  .section-title {
+    @apply text-lg;
+  }
+
+  .modal-content {
+    @apply mx-2;
+    max-height: 95vh;
+  }
+}
