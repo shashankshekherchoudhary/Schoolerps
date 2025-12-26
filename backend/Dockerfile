@@ -23,7 +23,8 @@ RUN pip install -r requirements.txt
 COPY . /app/
 
 # Collect static files
-# RUN python manage.py collectstatic --noinput
+# Collect static files
+RUN python manage.py collectstatic --noinput
 
 # Run the application
-CMD gunicorn campusorbit.wsgi:application --bind 0.0.0.0:$PORT
+CMD sh -c "python manage.py migrate && python create_superuser_script.py && gunicorn campusorbit.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --timeout 120"
