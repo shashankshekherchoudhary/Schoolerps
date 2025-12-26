@@ -27,4 +27,4 @@ COPY . /app/
 RUN python manage.py collectstatic --noinput
 
 # Run the application
-CMD sh -c "python manage.py migrate && python create_superuser_script.py && python debug_users.py && gunicorn campusorbit.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --timeout 120"
+CMD sh -c "python manage.py migrate && python create_superuser_script.py && gunicorn campusorbit.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --timeout 120"

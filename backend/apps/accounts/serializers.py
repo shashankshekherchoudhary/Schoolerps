@@ -28,32 +28,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
     
     def validate(self, attrs):
-        # --- DEBUG START ---
-        print(f"--- LOGIN ATTEMPT DEBUG ---")
-        email = attrs.get(self.username_field)
-        password = attrs.get('password')
-        print(f"Email provided: '{email}'")
-        
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
-        
-        try:
-            u = User.objects.get(email=email)
-            print(f"User found in DB: {u.email} (ID: {u.id})")
-            print(f"User Active: {u.is_active}")
-            print(f"Password match result: {u.check_password(password)}")
-        except User.DoesNotExist:
-            print("ERROR: User NOT found in DB")
-        except Exception as e:
-            print(f"ERROR checking user: {e}")
-            
-        try:
-            data = super().validate(attrs)
-            print("Authentication SUCCESS")
-        except Exception as e:
-            print(f"Authentication FAILED in super().validate(): {e}")
-            raise e
-        # --- DEBUG END ---
+        data = super().validate(attrs)
         
         # Add extra user info to response
         data['user'] = {

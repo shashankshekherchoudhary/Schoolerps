@@ -26,18 +26,22 @@ def create_superuser():
     try:
         user, created = User.objects.get_or_create(email=email)
         
-        # FORCE UPDATE PASSWORD (Essential for fixing login issues)
-        user.set_password(password)
-        user.is_staff = True
-        user.is_superuser = True
-        user.is_active = True
-        user.role = 'platform_admin' # Ensure role is set if model requires it
-        user.save()
-
         if created:
+            # Only set password for NEW users
+            user.set_password(password)
+            user.is_staff = True
+            user.is_superuser = True
+            user.is_active = True
+            user.role = 'platform_admin'
+            user.save()
             print(f"SUCCESS: Created new superuser '{email}'")
         else:
-            print(f"SUCCESS: Updated existing superuser '{email}' with verified password.")
+            # Ensure permissions are correct but DO NOT RESET PASSWORD
+            user.is_staff = True
+            user.is_superuser = True
+            user.is_active = True
+            user.save()
+            print(f"SUCCESS: Verified existing superuser '{email}' (Password unchanged).")
             
     except Exception as e:
         print(f"ERROR: Failed to configure superuser. Reason: {e}")
