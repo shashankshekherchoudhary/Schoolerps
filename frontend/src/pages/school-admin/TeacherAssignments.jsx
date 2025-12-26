@@ -192,7 +192,7 @@ export default function TeacherAssignments() {
                                 <select
                                     className="select"
                                     value={formData.teacher}
-                                    onChange={(e) => setFormData({ ...formData, teacher: e.target.value })}
+                                    onChange={(e) => setFormData({ ...formData, teacher: e.target.value, subject: '' })}
                                     required
                                 >
                                     <option value="">Select a teacher</option>
@@ -210,12 +210,26 @@ export default function TeacherAssignments() {
                                     value={formData.subject}
                                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                                     required
+                                    disabled={!formData.teacher}
                                 >
                                     <option value="">Select a subject</option>
-                                    {subjects?.results?.map(s => (
-                                        <option key={s.id} value={s.id}>{s.name}</option>
-                                    ))}
+                                    {(() => {
+                                        // Find selected teacher's subjects
+                                        const selectedTeacher = teachers?.results?.find(t => t.id === parseInt(formData.teacher))
+                                        const teacherSubjects = selectedTeacher?.subjects_list || []
+
+                                        if (teacherSubjects.length === 0 && formData.teacher) {
+                                            return <option disabled>No subjects assigned to this teacher</option>
+                                        }
+
+                                        return teacherSubjects.map(s => (
+                                            <option key={s.id} value={s.id}>{s.name}</option>
+                                        ))
+                                    })()}
                                 </select>
+                                {!formData.teacher && (
+                                    <p className="text-xs text-gray-500 mt-1">Select a teacher first</p>
+                                )}
                             </div>
 
                             {/* Class (for section selection) */}
