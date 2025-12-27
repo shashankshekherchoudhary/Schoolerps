@@ -30,7 +30,7 @@ export default function MarkAttendance() {
     }
 
     // Get sections from class teacher assignment
-    const sections = dashboard?.class_teacher_of ? [{ id: 'class', name: dashboard.class_teacher_of.section }] : []
+    const sections = dashboard?.class_teacher_of ? [{ id: dashboard.class_teacher_of.id, name: dashboard.class_teacher_of.section }] : []
 
     return (
         <div className="space-y-6">
