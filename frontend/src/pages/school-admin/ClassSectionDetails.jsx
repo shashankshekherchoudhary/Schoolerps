@@ -1,14 +1,18 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
-import { ArrowLeft, Users, BookOpen, User, Search, Mail, Phone, GraduationCap } from 'lucide-react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { ArrowLeft, Users, BookOpen, User, Search, Mail, Phone, GraduationCap, Edit2, X, AlertCircle } from 'lucide-react'
 import api from '../../services/api'
 
 export default function ClassSectionDetails() {
     const { classId, sectionId } = useParams()
     const navigate = useNavigate()
+    const queryClient = useQueryClient()
     const [activeTab, setActiveTab] = useState('students')
     const [searchTerm, setSearchTerm] = useState('')
+    const [showTeacherModal, setShowTeacherModal] = useState(false)
+    const [selectedTeacher, setSelectedTeacher] = useState('')
+    const [error, setError] = useState('')
 
     // Fetch Section Details
     const { data: section, isLoading: sectionLoading } = useQuery({
@@ -17,9 +21,21 @@ export default function ClassSectionDetails() {
     })
 
     // Fetch Class Teacher
-    const { data: classTeacher } = useQuery({
+    const { data: classTeacher, refetch: refetchClassTeacher } = useQuery({
         queryKey: ['class-teacher', sectionId],
         queryFn: () => api.get('/api/school/class-teachers/', { params: { section: sectionId } }).then(res => res.data[0])
+    })
+
+    // Fetch Teachers
+    const { data: teachers } = useQuery({
+        queryKey: ['teachers'],
+        queryFn: () => api.get('/api/school/teachers/').then(res => res.data)
+    })
+
+    // Fetch Academic Years
+    const { data: academicYears } = useQuery({
+        queryKey: ['academic-years'],
+        queryFn: () => api.get('/api/school/academic-years/').then(res => res.data)
     })
 
     // Fetch Students
@@ -33,6 +49,60 @@ export default function ClassSectionDetails() {
         queryKey: ['subject-teachers', { section: sectionId }],
         queryFn: () => api.get('/api/school/subject-teachers/', { params: { section: sectionId } }).then(res => res.data)
     })
+
+    const currentAcademicYear = academicYears?.results?.find(y => y.is_current)
+
+    // Assign Class Teacher Mutation
+    const assignMutation = useMutation({
+        mutationFn: (data) => {
+            if (classTeacher?.id) {
+                // Update existing
+                return api.patch(`/api/school/class-teachers/${classTeacher.id}/`, data)
+            }
+            // Create new
+            return api.post('/api/school/class-teachers/', data)
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries(['class-teacher', sectionId])
+            setShowTeacherModal(false)
+            setSelectedTeacher('')
+            setError('')
+        },
+        onError: (err) => {
+            setError(err.response?.data?.detail || JSON.stringify(err.response?.data) || 'Failed to assign class teacher')
+        }
+    })
+
+    // Remove Class Teacher Mutation
+    const removeMutation = useMutation({
+        mutationFn: () => api.delete(`/api/school/class-teachers/${classTeacher.id}/`),
+        onSuccess: () => {
+            queryClient.invalidateQueries(['class-teacher', sectionId])
+        }
+    })
+
+    const handleAssignClassTeacher = (e) => {
+        e.preventDefault()
+        if (!selectedTeacher) {
+            setError('Please select a teacher')
+            return
+        }
+        if (!currentAcademicYear) {
+            setError('No active academic year. Please set one first.')
+            return
+        }
+        assignMutation.mutate({
+            section: parseInt(sectionId),
+            teacher: parseInt(selectedTeacher),
+            academic_year: currentAcademicYear.id
+        })
+    }
+
+    const openAssignModal = () => {
+        setSelectedTeacher(classTeacher?.teacher || '')
+        setError('')
+        setShowTeacherModal(true)
+    }
 
     const filteredStudents = students?.results?.filter(student =>
         student.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -70,22 +140,97 @@ export default function ClassSectionDetails() {
                 </div>
             </div>
 
+            {/* Class Teacher Assignment Modal */}
+            {showTeacherModal && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md">
+                        <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                    {classTeacher ? 'Change Class Teacher' : 'Assign Class Teacher'}
+                                </h2>
+                                <button onClick={() => setShowTeacherModal(false)} className="text-gray-500 hover:text-gray-600">
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+                        <form onSubmit={handleAssignClassTeacher} className="p-6 space-y-4">
+                            {error && (
+                                <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-sm text-red-700">
+                                    <AlertCircle className="w-4 h-4" />
+                                    {error}
+                                </div>
+                            )}
+
+                            <div>
+                                <label className="label">Section</label>
+                                <p className="text-lg font-medium text-gray-900 dark:text-white">
+                                    {section?.class_name} - {section?.name}
+                                </p>
+                            </div>
+
+                            <div>
+                                <label className="label">Select Teacher *</label>
+                                <select
+                                    className="select"
+                                    value={selectedTeacher}
+                                    onChange={(e) => setSelectedTeacher(e.target.value)}
+                                    required
+                                >
+                                    <option value="">Select a teacher</option>
+                                    {teachers?.results?.map(t => (
+                                        <option key={t.id} value={t.id}>{t.full_name}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="label">Academic Year</label>
+                                <p className="text-gray-600 dark:text-gray-400">
+                                    {currentAcademicYear?.name || 'No active academic year'}
+                                </p>
+                            </div>
+
+                            <div className="flex gap-3 pt-4">
+                                <button type="button" onClick={() => setShowTeacherModal(false)} className="btn btn-secondary flex-1">
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="btn btn-primary flex-1"
+                                    disabled={assignMutation.isPending}
+                                >
+                                    {assignMutation.isPending ? 'Saving...' : 'Assign Teacher'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
             {/* Class Teacher Card */}
             <div className="card p-6 bg-gradient-to-br from-primary-50 to-white dark:from-gray-800 dark:to-gray-900 border-primary-100 dark:border-gray-700">
-                <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-xl flex items-center justify-center text-primary-600 dark:text-primary-400">
-                        <GraduationCap className="w-6 h-6" />
-                    </div>
-                    <div>
-                        <h3 className="text-sm font-medium text-primary-600 dark:text-primary-400 mb-1">Class Teacher</h3>
-                        {classTeacher ? (
-                            <div>
+                <div className="flex items-start justify-between">
+                    <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-xl flex items-center justify-center text-primary-600 dark:text-primary-400">
+                            <GraduationCap className="w-6 h-6" />
+                        </div>
+                        <div>
+                            <h3 className="text-sm font-medium text-primary-600 dark:text-primary-400 mb-1">Class Teacher</h3>
+                            {classTeacher ? (
                                 <p className="text-lg font-semibold text-gray-900 dark:text-white">{classTeacher.teacher_name}</p>
-                            </div>
-                        ) : (
-                            <p className="text-gray-500 italic">No class teacher assigned</p>
-                        )}
+                            ) : (
+                                <p className="text-gray-500 italic">No class teacher assigned</p>
+                            )}
+                        </div>
                     </div>
+                    <button
+                        onClick={openAssignModal}
+                        className="btn btn-sm btn-secondary"
+                    >
+                        <Edit2 className="w-4 h-4" />
+                        {classTeacher ? 'Change' : 'Assign'}
+                    </button>
                 </div>
             </div>
 
@@ -94,8 +239,8 @@ export default function ClassSectionDetails() {
                 <button
                     onClick={() => setActiveTab('students')}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'students'
-                            ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-white shadow-sm'
-                            : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                        ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-white shadow-sm'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                         }`}
                 >
                     Students ({students?.count || 0})
@@ -103,8 +248,8 @@ export default function ClassSectionDetails() {
                 <button
                     onClick={() => setActiveTab('subjects')}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'subjects'
-                            ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-white shadow-sm'
-                            : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                        ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-white shadow-sm'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                         }`}
                 >
                     Subject Teachers ({subjectTeachers?.results?.length || 0})
