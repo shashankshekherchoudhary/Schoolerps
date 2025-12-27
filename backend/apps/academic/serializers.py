@@ -22,11 +22,15 @@ class AcademicYearSerializer(serializers.ModelSerializer):
 
 class SectionSerializer(serializers.ModelSerializer):
     class_name = serializers.CharField(source='school_class.name', read_only=True)
+    student_count = serializers.SerializerMethodField()
     
     class Meta:
         model = Section
-        fields = ['id', 'name', 'school_class', 'class_name']
+        fields = ['id', 'name', 'school_class', 'class_name', 'student_count']
         read_only_fields = ['id']
+    
+    def get_student_count(self, obj):
+        return obj.students.filter(status='active').count()
 
 
 class ClassSerializer(serializers.ModelSerializer):
