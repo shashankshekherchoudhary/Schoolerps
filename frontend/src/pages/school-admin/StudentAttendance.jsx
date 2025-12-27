@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import api from '../../services/api'
-import { Save, Check, X, Users, Calendar } from 'lucide-react'
+import { Save, Check, X, Users, Calendar, AlertCircle } from 'lucide-react'
 import clsx from 'clsx'
 
 export default function StudentAttendance() {
@@ -31,9 +31,31 @@ export default function StudentAttendance() {
         setSaveError('')
     }
 
+    // Calculate unmarked students count
+    const { unmarkedCount, allMarked, totalStudents } = useMemo(() => {
+        const students = attendanceData?.students || []
+        const total = students.length
+        let unmarked = 0
+
+        for (const student of students) {
+            // Check: local state first, then API status, else null (unmarked)
+            const status = attendances[student.student_id] ?? student.status ?? null
+            if (status === null) {
+                unmarked++
+            }
+        }
+
+        return {
+            unmarkedCount: unmarked,
+            allMarked: unmarked === 0 && total > 0,
+            totalStudents: total
+        }
+    }, [attendanceData?.students, attendances])
+
     const handleSave = async () => {
-        if (Object.keys(attendances).length === 0) {
-            setSaveError('No attendance changes to save')
+        // Validate: all students must be marked
+        if (!allMarked) {
+            setSaveError(`${unmarkedCount} student(s) not marked. Please mark all students before saving.`)
             return
         }
 
@@ -41,12 +63,13 @@ export default function StudentAttendance() {
         setSaveError('')
 
         try {
+            const students = attendanceData?.students || []
             const data = {
                 section: parseInt(selectedSection),
                 date: selectedDate,
-                attendances: Object.entries(attendances).map(([studentId, status]) => ({
-                    student_id: parseInt(studentId),
-                    status
+                attendances: students.map(student => ({
+                    student_id: student.student_id,
+                    status: attendances[student.student_id] ?? student.status
                 }))
             }
             await api.post('/api/attendance/students/bulk_mark/', data)
@@ -62,19 +85,49 @@ export default function StudentAttendance() {
         }
     }
 
+    // Mark all students present/absent at once
+    const markAll = (status) => {
+        const students = attendanceData?.students || []
+        const newAttendances = { ...attendances }
+        for (const student of students) {
+            newAttendances[student.student_id] = status
+        }
+        setAttendances(newAttendances)
+    }
+
     const allSections = classes?.results?.flatMap(c =>
         c.sections?.map(s => ({ ...s, className: c.name }))
     ) || []
 
+    // Get status for a student (null = not marked)
+    const getStatus = (student) => {
+        return attendances[student.student_id] ?? student.status ?? null
+    }
+
+    // Get badge class based on status
+    const getBadgeClass = (status) => {
+        if (status === 'present') return 'badge-success'
+        if (status === 'absent') return 'badge-danger'
+        return 'bg-gray-200 text-gray-600' // Neutral/Not marked
+    }
+
+    // Get badge text
+    const getBadgeText = (status) => {
+        if (status === 'present') return 'Present'
+        if (status === 'absent') return 'Absent'
+        return 'Not Marked'
+    }
+
     const getStatusCounts = () => {
         const students = attendanceData?.students || []
-        let present = 0, absent = 0
+        let present = 0, absent = 0, notMarked = 0
         students.forEach(s => {
-            const status = attendances[s.student_id] ?? s.status ?? 'present'
+            const status = getStatus(s)
             if (status === 'present') present++
             else if (status === 'absent') absent++
+            else notMarked++
         })
-        return { present, absent, total: students.length }
+        return { present, absent, notMarked, total: students.length }
     }
 
     const counts = getStatusCounts()
@@ -99,7 +152,11 @@ export default function StudentAttendance() {
                             <select
                                 className="select"
                                 value={selectedSection}
-                                onChange={(e) => setSelectedSection(e.target.value)}
+                                onChange={(e) => {
+                                    setSelectedSection(e.target.value)
+                                    setAttendances({}) // Reset when section changes
+                                    setSaveError('')
+                                }}
                             >
                                 <option value="">Choose a section...</option>
                                 {allSections.map(s => (
@@ -118,7 +175,11 @@ export default function StudentAttendance() {
                                 type="date"
                                 className="input"
                                 value={selectedDate}
-                                onChange={(e) => setSelectedDate(e.target.value)}
+                                onChange={(e) => {
+                                    setSelectedDate(e.target.value)
+                                    setAttendances({}) // Reset when date changes
+                                    setSaveError('')
+                                }}
                             />
                         </div>
                     </div>
@@ -129,7 +190,7 @@ export default function StudentAttendance() {
             {selectedSection && attendanceData?.students && (
                 <>
                     {/* Quick Stats */}
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-4 gap-4">
                         <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
                             <p className="text-2xl font-bold text-emerald-600">{counts.present}</p>
                             <p className="text-sm text-gray-500">Present</p>
@@ -137,6 +198,10 @@ export default function StudentAttendance() {
                         <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
                             <p className="text-2xl font-bold text-red-600">{counts.absent}</p>
                             <p className="text-sm text-gray-500">Absent</p>
+                        </div>
+                        <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+                            <p className="text-2xl font-bold text-amber-600">{counts.notMarked}</p>
+                            <p className="text-sm text-gray-500">Not Marked</p>
                         </div>
                         <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
                             <p className="text-2xl font-bold text-gray-900">{counts.total}</p>
@@ -147,7 +212,7 @@ export default function StudentAttendance() {
                     {/* Error Message */}
                     {saveError && (
                         <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-700">
-                            <X size={20} className="flex-shrink-0" />
+                            <AlertCircle size={20} className="flex-shrink-0" />
                             <span>{saveError}</span>
                             <button onClick={() => setSaveError('')} className="ml-auto text-red-500 hover:text-red-700">
                                 <X size={16} />
@@ -158,16 +223,36 @@ export default function StudentAttendance() {
                     {/* Student Table */}
                     <div className="card">
                         <div className="card-header flex items-center justify-between">
-                            <h3 className="font-semibold text-gray-900">
-                                {attendanceData.students.length} Students
-                            </h3>
+                            <div className="flex items-center gap-4">
+                                <h3 className="font-semibold text-gray-900">
+                                    {attendanceData.students.length} Students
+                                </h3>
+                                {/* Mark All buttons */}
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => markAll('present')}
+                                        className="btn btn-sm btn-secondary"
+                                        title="Mark All Present"
+                                    >
+                                        <Check size={14} /> All Present
+                                    </button>
+                                    <button
+                                        onClick={() => markAll('absent')}
+                                        className="btn btn-sm btn-secondary"
+                                        title="Mark All Absent"
+                                    >
+                                        <X size={14} /> All Absent
+                                    </button>
+                                </div>
+                            </div>
                             <button
                                 onClick={handleSave}
                                 className={clsx(
                                     "btn",
-                                    saveSuccess ? "btn-success" : "btn-primary"
+                                    saveSuccess ? "btn-success" : allMarked ? "btn-primary" : "btn-secondary opacity-70"
                                 )}
-                                disabled={isSaving}
+                                disabled={isSaving || !allMarked}
+                                title={!allMarked ? 'Mark all students first' : 'Save Attendance'}
                             >
                                 {isSaving ? (
                                     <span className="spinner"></span>
@@ -196,7 +281,7 @@ export default function StudentAttendance() {
                                 </thead>
                                 <tbody>
                                     {attendanceData.students.map((student) => {
-                                        const status = attendances[student.student_id] ?? student.status ?? 'present'
+                                        const status = getStatus(student)
                                         return (
                                             <tr key={student.student_id}>
                                                 <td className="font-medium text-gray-900">
@@ -209,11 +294,8 @@ export default function StudentAttendance() {
                                                     </div>
                                                 </td>
                                                 <td className="text-center">
-                                                    <span className={clsx(
-                                                        "badge",
-                                                        status === 'present' ? "badge-success" : "badge-danger"
-                                                    )}>
-                                                        {status === 'present' ? 'Present' : 'Absent'}
+                                                    <span className={clsx("badge", getBadgeClass(status))}>
+                                                        {getBadgeText(status)}
                                                     </span>
                                                 </td>
                                                 <td>
