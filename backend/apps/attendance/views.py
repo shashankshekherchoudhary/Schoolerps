@@ -87,8 +87,15 @@ class StudentAttendanceViewSet(viewsets.ModelViewSet):
         
         for att_data in attendances_data:
             student_id = att_data.get('student_id')
-            att_status = att_data.get('status', 'present')
+            att_status = att_data.get('status')
             remarks = att_data.get('remarks', '')
+            
+            # Validate: status is required and must be explicit
+            if not att_status or att_status not in ['present', 'absent', 'late']:
+                return Response(
+                    {'error': f'Invalid or missing status for student ID {student_id}. Status must be present, absent, or late.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
             
             attendance, created = StudentAttendance.objects.update_or_create(
                 student_id=student_id,
@@ -199,8 +206,15 @@ class TeacherAttendanceViewSet(viewsets.ModelViewSet):
         
         for att_data in attendances_data:
             teacher_id = att_data.get('teacher_id')
-            att_status = att_data.get('status', 'present')
+            att_status = att_data.get('status')
             remarks = att_data.get('remarks', '')
+            
+            # Validate: status is required and must be explicit
+            if not att_status or att_status not in ['present', 'absent', 'late', 'leave']:
+                return Response(
+                    {'error': f'Invalid or missing status for teacher ID {teacher_id}. Status must be present, absent, late, or leave.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
             
             _, created = TeacherAttendance.objects.update_or_create(
                 teacher_id=teacher_id,
