@@ -85,6 +85,9 @@ class Subject(models.Model):
     name = models.CharField(max_length=100)
     code = models.CharField(max_length=20, blank=True, null=True)
     
+    # Classes where this subject is taught
+    classes = models.ManyToManyField(Class, related_name='subjects', blank=True)
+    
     class Meta:
         db_table = 'subjects'
         unique_together = ['school', 'name']

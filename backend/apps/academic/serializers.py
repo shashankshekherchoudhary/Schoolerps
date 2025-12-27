@@ -51,10 +51,20 @@ class ClassSerializer(serializers.ModelSerializer):
 
 
 class SubjectSerializer(serializers.ModelSerializer):
+    classes = serializers.PrimaryKeyRelatedField(
+        queryset=Class.objects.all(),
+        many=True,
+        required=False
+    )
+    classes_list = serializers.SerializerMethodField()
+    
     class Meta:
         model = Subject
-        fields = ['id', 'name', 'code']
+        fields = ['id', 'name', 'code', 'classes', 'classes_list']
         read_only_fields = ['id']
+    
+    def get_classes_list(self, obj):
+        return [{'id': c.id, 'name': c.name} for c in obj.classes.all()]
 
 
 class TeacherListSerializer(serializers.ModelSerializer):
