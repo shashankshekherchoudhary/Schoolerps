@@ -23,7 +23,11 @@ export default function ClassSectionDetails() {
     // Fetch Class Teacher
     const { data: classTeacher, refetch: refetchClassTeacher } = useQuery({
         queryKey: ['class-teacher', sectionId],
-        queryFn: () => api.get('/api/school/class-teachers/', { params: { section: sectionId } }).then(res => res.data[0])
+        queryFn: () => api.get('/api/school/class-teachers/', { params: { section: sectionId } }).then(res => {
+            // Handle both array and paginated response
+            const data = res.data?.results || res.data
+            return Array.isArray(data) ? data[0] : null
+        })
     })
 
     // Fetch Teachers

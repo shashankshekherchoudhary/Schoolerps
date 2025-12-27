@@ -492,6 +492,13 @@ class ClassTeacherViewSet(viewsets.ModelViewSet):
         section_id = self.request.query_params.get('section')
         if section_id:
             queryset = queryset.filter(section_id=section_id)
+        
+        # Filter for current academic year if available
+        current_year = AcademicYear.objects.filter(
+            school=self.request.user.school, is_current=True
+        ).first()
+        if current_year:
+            queryset = queryset.filter(academic_year=current_year)
             
         return queryset
 
