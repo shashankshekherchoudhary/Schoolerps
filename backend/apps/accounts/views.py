@@ -15,6 +15,7 @@ from .serializers import (
     UserSerializer,
     PasswordChangeSerializer
 )
+from .throttles import LoginRateThrottle
 
 User = get_user_model()
 
@@ -22,6 +23,7 @@ User = get_user_model()
 class CustomTokenObtainPairView(TokenObtainPairView):
     """Custom login view that returns user info along with tokens."""
     serializer_class = CustomTokenObtainPairSerializer
+    throttle_classes = [LoginRateThrottle]  # Rate limit: 5 attempts/minute
     
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
