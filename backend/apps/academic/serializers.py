@@ -135,7 +135,7 @@ class TeacherCreateSerializer(serializers.Serializer):
     first_name = serializers.CharField(max_length=100)
     last_name = serializers.CharField(max_length=100)
     phone = serializers.CharField(max_length=10, required=False, allow_blank=True)
-    password = serializers.CharField(write_only=True, min_length=8)
+    password = serializers.CharField(write_only=True, min_length=8, required=False, default='school123')
     
     def validate_phone(self, value):
         from apps.core.validators import validate_phone_serializer
@@ -238,7 +238,7 @@ class StudentCreateSerializer(serializers.Serializer):
     first_name = serializers.CharField(max_length=100)
     last_name = serializers.CharField(max_length=100)
     phone = serializers.CharField(max_length=20, required=False, allow_blank=True)
-    password = serializers.CharField(write_only=True, min_length=8)
+    password = serializers.CharField(write_only=True, min_length=8, required=False, default='school123')
     
     admission_number = serializers.CharField(max_length=50)
     admission_date = serializers.DateField(required=False, allow_null=True)
