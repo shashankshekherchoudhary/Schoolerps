@@ -329,6 +329,30 @@ class ClassTeacherSerializer(serializers.ModelSerializer):
     
     def get_section_name(self, obj):
         return str(obj.section)
+    
+    def validate(self, data):
+        """Ensure teacher is not already assigned to another section in the same academic year."""
+        teacher = data.get('teacher')
+        academic_year = data.get('academic_year')
+        section = data.get('section')
+        
+        if teacher and academic_year:
+            # Check if this teacher is already a class teacher for another section
+            existing = ClassTeacher.objects.filter(
+                teacher=teacher,
+                academic_year=academic_year
+            )
+            
+            # Exclude current instance if updating
+            if self.instance:
+                existing = existing.exclude(pk=self.instance.pk)
+            
+            if existing.exists():
+                raise serializers.ValidationError({
+                    'teacher': 'This teacher is already assigned as class teacher to another section.'
+                })
+        
+        return data
 
 
 class SubjectTeacherSerializer(serializers.ModelSerializer):

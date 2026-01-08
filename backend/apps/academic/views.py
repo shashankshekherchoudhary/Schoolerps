@@ -199,6 +199,37 @@ class TeacherViewSet(viewsets.ModelViewSet):
         teacher.user.save(update_fields=['is_active'])
         return Response({'is_active': teacher.user.is_active})
     
+    @action(detail=False, methods=['get'])
+    def available_for_class_teacher(self, request):
+        """
+        Get teachers available for class teacher assignment.
+        Excludes teachers already assigned as class teacher in current academic year.
+        """
+        school = request.user.school
+        current_year = AcademicYear.objects.filter(school=school, is_current=True).first()
+        
+        # Get all active teachers
+        teachers = Teacher.objects.filter(
+            school=school,
+            user__is_active=True
+        ).select_related('user')
+        
+        if current_year:
+            # Get teachers already assigned as class teachers this year
+            assigned_teacher_ids = ClassTeacher.objects.filter(
+                academic_year=current_year
+            ).values_list('teacher_id', flat=True)
+            
+            # Allow current teacher to appear (for edit case)
+            current_teacher_id = request.query_params.get('current_teacher')
+            if current_teacher_id:
+                assigned_teacher_ids = [tid for tid in assigned_teacher_ids if tid != int(current_teacher_id)]
+            
+            # Exclude assigned teachers
+            teachers = teachers.exclude(id__in=assigned_teacher_ids)
+        
+        return Response(TeacherListSerializer(teachers, many=True).data)
+    
     @action(detail=True, methods=['post'])
     def reset_password(self, request, pk=None):
         """Reset teacher's password."""

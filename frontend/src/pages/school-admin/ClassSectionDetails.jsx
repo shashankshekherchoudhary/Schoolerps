@@ -30,10 +30,12 @@ export default function ClassSectionDetails() {
         })
     })
 
-    // Fetch Teachers
-    const { data: teachers } = useQuery({
-        queryKey: ['teachers'],
-        queryFn: () => api.get('/api/school/teachers/').then(res => res.data)
+    // Fetch Available Teachers (excludes already-assigned class teachers)
+    const { data: availableTeachers } = useQuery({
+        queryKey: ['available-teachers', classTeacher?.teacher],
+        queryFn: () => api.get('/api/school/teachers/available_for_class_teacher/', {
+            params: { current_teacher: classTeacher?.teacher || '' }
+        }).then(res => res.data)
     })
 
     // Fetch Academic Years
@@ -182,10 +184,13 @@ export default function ClassSectionDetails() {
                                     required
                                 >
                                     <option value="">Select a teacher</option>
-                                    {teachers?.results?.map(t => (
+                                    {availableTeachers?.map(t => (
                                         <option key={t.id} value={t.id}>{t.full_name}</option>
                                     ))}
                                 </select>
+                                {availableTeachers?.length === 0 && (
+                                    <p className="text-xs text-amber-600 mt-1">All teachers are already assigned as class teachers.</p>
+                                )}
                             </div>
 
                             <div>

@@ -138,7 +138,7 @@ class Teacher(models.Model):
 
 
 class ClassTeacher(models.Model):
-    """Class teacher assignment (one per section)."""
+    """Class teacher assignment (one per section, one per teacher per year)."""
     section = models.OneToOneField(
         Section,
         on_delete=models.CASCADE,
@@ -157,7 +157,14 @@ class ClassTeacher(models.Model):
     
     class Meta:
         db_table = 'class_teachers'
-        unique_together = ['section', 'academic_year']
+        # Constraint 1: One section can have only one class teacher per year (already via OneToOneField on section)
+        # Constraint 2: One teacher can be class teacher of only ONE section per year
+        constraints = [
+            models.UniqueConstraint(
+                fields=['teacher', 'academic_year'],
+                name='unique_teacher_per_academic_year'
+            )
+        ]
     
     def __str__(self):
         return f"{self.teacher.full_name} - {self.section}"
