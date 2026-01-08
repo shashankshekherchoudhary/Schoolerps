@@ -151,8 +151,9 @@ SIMPLE_JWT = {
 }
 
 # CORS Settings - Production Ready
-# For Railway/Cloud deployments, allow all origins since SSL is handled at proxy level
-CORS_ALLOW_ALL_ORIGINS = True  # Permanent fix for Railway
+# Only allow specific frontend origins
+CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', cast=Csv(), default='http://localhost:3000,http://localhost:5173')
+CORS_ALLOW_ALL_ORIGINS = False  # SECURITY: Explicit origins only
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
     'accept',

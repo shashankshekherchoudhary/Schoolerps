@@ -210,7 +210,7 @@ class TeacherAttendanceViewSet(viewsets.ModelViewSet):
             remarks = att_data.get('remarks', '')
             
             # Validate: status is required and must be explicit
-            if not att_status or att_status not in ['present', 'absent', 'late', 'leave']:
+            if not att_status or att_status not in ['present', 'absent', 'late', 'half_day', 'on_leave']:
                 return Response(
                     {'error': f'Invalid or missing status for teacher ID {teacher_id}. Status must be present, absent, late, or leave.'},
                     status=status.HTTP_400_BAD_REQUEST

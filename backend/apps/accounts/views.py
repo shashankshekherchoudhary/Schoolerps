@@ -108,9 +108,9 @@ class PasswordChangeView(APIView):
 class DebugStatusView(APIView):
     """
     Safe diagnostic endpoint to verify Production setup.
-    Public access allowed.
+    PROTECTED: Only Platform Admin can access.
     """
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     
     def get(self, request):
         from django.conf import settings
