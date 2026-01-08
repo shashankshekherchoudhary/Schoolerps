@@ -67,6 +67,13 @@ class StudentAttendanceViewSet(viewsets.ModelViewSet):
         date = data['date']
         attendances_data = data['attendances']
         
+        # Validate: Cannot mark attendance for future dates
+        if date > timezone.now().date():
+            return Response(
+                {'error': 'Cannot mark attendance for future dates.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
         # Verify permission if teacher
         if request.user.role == 'teacher':
             try:
@@ -200,6 +207,13 @@ class TeacherAttendanceViewSet(viewsets.ModelViewSet):
         data = serializer.validated_data
         date = data['date']
         attendances_data = data['attendances']
+        
+        # Validate: Cannot mark attendance for future dates
+        if date > timezone.now().date():
+            return Response(
+                {'error': 'Cannot mark attendance for future dates.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
         created_count = 0
         updated_count = 0

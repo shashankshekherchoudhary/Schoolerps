@@ -33,8 +33,8 @@ class StudentAttendance(models.Model):
     
     status = models.CharField(
         max_length=20,
-        choices=Status.choices,
-        default=Status.PRESENT
+        choices=Status.choices
+        # No default - attendance must be explicitly marked
     )
     
     marked_by = models.ForeignKey(
@@ -86,8 +86,8 @@ class TeacherAttendance(models.Model):
     
     status = models.CharField(
         max_length=20,
-        choices=Status.choices,
-        default=Status.PRESENT
+        choices=Status.choices
+        # No default - attendance must be explicitly marked
     )
     
     marked_by = models.ForeignKey(

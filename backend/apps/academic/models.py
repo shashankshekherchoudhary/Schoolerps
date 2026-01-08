@@ -277,6 +277,8 @@ class Student(models.Model):
     def email(self):
         return self.user.email
     
+    @property
+    def class_name(self):
         if self.current_class and self.current_section:
             return f"{self.current_class.name} - {self.current_section.name}"
         return None

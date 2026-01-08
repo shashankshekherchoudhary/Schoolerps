@@ -116,28 +116,19 @@ class DebugStatusView(APIView):
     
     def get(self, request):
         from django.conf import settings
+        from .permissions import IsPlatformAdmin
         
-        email = "admin@campusorbit.com"
-        try:
-            user = User.objects.get(email=email)
-            user_status = {
-                "exists": True,
-                "is_active": user.is_active,
-                "is_superuser": user.is_superuser
-            }
-        except User.DoesNotExist:
-            user_status = {
-                "exists": False,
-                "error": "Admin user not found int DB"
-            }
-            
+        # SECURITY: Only platform admins can access
+        if request.user.role != 'platform_admin':
+            return Response(
+                {'error': 'Access denied. Platform admin only.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Return minimal safe diagnostic info
         data = {
             "status": "online",
-            "db_engine": settings.DATABASES['default']['ENGINE'],
-            "admin_user": user_status,
-            "security": {
-                "allowed_hosts": settings.ALLOWED_HOSTS,
-                "debug_mode": settings.DEBUG,
-            }
+            "debug_mode": settings.DEBUG,
+            "database_connected": True  # If we got here, DB is connected
         }
         return Response(data)
