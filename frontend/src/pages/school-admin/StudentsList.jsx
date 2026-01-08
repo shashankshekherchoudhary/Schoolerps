@@ -83,7 +83,9 @@ export default function StudentsList() {
                                     <tr key={student.id}>
                                         <td className="font-medium text-gray-900 dark:text-white">{student.full_name}</td>
                                         <td className="text-gray-600 dark:text-gray-300">{student.admission_number}</td>
-                                        <td className="text-gray-600 dark:text-gray-300">{student.class_name || 'N/A'}</td>
+                                        <td className="text-gray-600 dark:text-gray-300">
+                                            {student.class_name || <span className="text-amber-600 italic">Class not assigned</span>}
+                                        </td>
                                         <td className="text-gray-600 dark:text-gray-300">{student.parent_phone || 'N/A'}</td>
                                         <td>
                                             <span className={`badge badge-${student.status === 'active' ? 'success' : 'danger'}`}>

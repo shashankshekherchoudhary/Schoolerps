@@ -242,8 +242,8 @@ class StudentCreateSerializer(serializers.Serializer):
     
     admission_number = serializers.CharField(max_length=50)
     admission_date = serializers.DateField(required=False, allow_null=True)
-    current_class = serializers.IntegerField(required=False, allow_null=True)
-    current_section = serializers.IntegerField(required=False, allow_null=True)
+    current_class = serializers.IntegerField(required=True)  # REQUIRED - students must have a class
+    current_section = serializers.IntegerField(required=True)  # REQUIRED - students must have a section
     # roll_number is auto-assigned based on alphabetical order
     
     date_of_birth = serializers.DateField(required=False, allow_null=True)
